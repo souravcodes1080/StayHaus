@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using Backend.Exceptions;
 using Backend.Responses;
 
 namespace Backend.Middlewares
@@ -15,12 +16,18 @@ namespace Backend.Middlewares
             catch (Exception ex)
             {
                 context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                var statusCode = ex switch
+                {
+                    BadRequestException => HttpStatusCode.BadRequest,
+                    _ => HttpStatusCode.InternalServerError
+                };
 
-                var response = new ApiErrorResponse(
+                context.Response.StatusCode = (int) statusCode;
+
+                var response = new ApiResponse<object>(
                     statusCode: context.Response.StatusCode,
-                    message: "An unexpected error occurred.",
-                    details:environment.IsDevelopment() ? ex.Message : null
+                    message: ex is BadRequestException ? ex.Message : "An unexpected error occurred.",
+                    details:environment.IsDevelopment() ? ex.StackTrace : null
                 );
                 
                 var option = new JsonSerializerOptions

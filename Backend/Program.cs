@@ -1,7 +1,11 @@
 using System.Text;
 using Backend.Data;
+using Backend.Entities;
+using Backend.Interfaces;
 using Backend.Middlewares;
+using Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -50,6 +54,8 @@ builder.Services.AddCors(option =>
     });
 });
 
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 

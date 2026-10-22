@@ -1,4 +1,5 @@
 using Backend.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -7,7 +8,7 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class AppController : ControllerBase
     {
-        
+        [Authorize(Roles = "User")]
         [HttpGet]
         public async Task<IActionResult> GetApp()
         {

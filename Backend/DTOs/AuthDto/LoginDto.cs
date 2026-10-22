@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Backend.DTOs.AuthDto
 {
-    public class Login
+    public class LoginDto
     {
         [Required(ErrorMessage = "Email address is required.")]
         [EmailAddress(ErrorMessage = "Must be a valid email address.")]
