@@ -8,8 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
-    public class AuthService (AppDbContext context, ITokenService tokenService) : IAuthService
+    public class AuthService(AppDbContext context, ITokenService tokenService, IPasswordHasher<User> passwordHasher) : IAuthService
     {
+        private readonly AppDbContext context = context;
+        private readonly ITokenService tokenService = tokenService;
+        private readonly IPasswordHasher<User> passwordHasher = passwordHasher;
+
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto user)
         {
             var email = user.Email.Trim().ToLower();
@@ -27,8 +31,6 @@ namespace Backend.Services
                 Email = email,
             };
 
-            var passwordHasher = new PasswordHasher<User>();
-
             newUser.HashedPassword = passwordHasher.HashPassword(newUser, user.Password);
 
             await context.User.AddAsync(newUser);
@@ -45,7 +47,25 @@ namespace Backend.Services
         }
         public async Task<AuthResponseDto> LoginAsync(LoginDto user)
         {
-            throw new NotImplementedException();
+            var email = user.Email.Trim().ToLower();
+
+            var existingUser = await context.User.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email) ?? throw new BadRequestException("Invalid email or password.");
+
+            var result = passwordHasher.VerifyHashedPassword(existingUser, existingUser.HashedPassword, user.Password);
+
+            if(result == PasswordVerificationResult.Failed)
+            {
+                throw new BadRequestException("Invalid email or password.");
+            }
+
+            return new AuthResponseDto
+            {
+                Id = existingUser.Id,
+                Name = existingUser.Name,
+                Email = existingUser.Email,
+                Role = existingUser.Role,
+                Token = tokenService.CreateToken(existingUser)
+            }; 
         }
     }
 }

@@ -16,7 +16,18 @@ namespace Backend.Controllers
             return Ok(new ApiResponse<AuthResponseDto>
             (
                 success: true,
-                message: "User registration sucessfull!",
+                message: "User registration successful.",
+                data: result
+            ));
+        }
+        [HttpPost("login")]
+        public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Login([FromBody] LoginDto user)
+        {
+            var result = await service.LoginAsync(user);
+            return Ok(new ApiResponse<AuthResponseDto>
+            (
+                success: true,
+                message: "User login successful.",
                 data: result
             ));
         }
