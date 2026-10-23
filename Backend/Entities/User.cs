@@ -19,6 +19,6 @@ namespace Backend.Entities
         
         public Role Role { get; set; } = Role.User;
 
-        // public List<Booking> Bookings { get; set; } = [];
+        public List<Booking> Bookings { get; set; } = [];
     }
 }

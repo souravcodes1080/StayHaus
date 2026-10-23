@@ -18,7 +18,7 @@ namespace Backend.Services
         {
             var email = user.Email.Trim().ToLower();
 
-            var existingUser = await context.User.AnyAsync(u=>u.Email == email);
+            var existingUser = await context.Users.AnyAsync(u=>u.Email == email);
 
             if (existingUser)
             {
@@ -33,7 +33,7 @@ namespace Backend.Services
 
             newUser.HashedPassword = passwordHasher.HashPassword(newUser, user.Password);
 
-            await context.User.AddAsync(newUser);
+            await context.Users.AddAsync(newUser);
             await context.SaveChangesAsync();
 
             return new AuthResponseDto
@@ -49,7 +49,7 @@ namespace Backend.Services
         {
             var email = user.Email.Trim().ToLower();
 
-            var existingUser = await context.User.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email) ?? throw new BadRequestException("Invalid email or password.");
+            var existingUser = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email) ?? throw new BadRequestException("Invalid email or password.");
 
             var result = passwordHasher.VerifyHashedPassword(existingUser, existingUser.HashedPassword, user.Password);
 
